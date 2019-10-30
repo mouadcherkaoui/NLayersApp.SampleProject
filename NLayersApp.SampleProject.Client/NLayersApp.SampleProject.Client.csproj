@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <LangVersion>7.3</LangVersion>
+    <RazorLangVersion>3.0</RazorLangVersion>
+    <RestoreSources>
+      https://api.nuget.org/v3/index.json;
+      https://pkgs.dev.azure.com/cherkaouimouad/NLayersApp.CQRS/_packaging/NLayersApp.CQRS/nuget/v3/index.json;
+      https://pkgs.dev.azure.com/cherkaouimouad/NLayersApp.Controllers/_packaging/NLayersApp.Controllers/nuget/v3/index.json;
+      https://pkgs.dev.azure.com/cherkaouimouad/NLayersApp.Authorisation/_packaging/NLayersApp.Authorisation/nuget/v3/index.json;
+      https://pkgs.dev.azure.com/cherkaouimouad/NLayersApp.Persistence/_packaging/NLayersApp.Persistence/nuget/v3/index.json;
+    </RestoreSources>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Blazor" Version="3.0.0-preview9.19465.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Blazor.Build" Version="3.0.0-preview9.19465.2" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Blazor.HttpClient" Version="3.0.0-preview9.19465.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Blazor.DevServer" Version="3.0.0-preview9.19465.2" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>
