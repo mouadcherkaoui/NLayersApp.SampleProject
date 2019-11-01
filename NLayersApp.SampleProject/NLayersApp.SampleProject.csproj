@@ -7,6 +7,7 @@
     <ApplicationIcon />
     <OutputType>Exe</OutputType>
     <StartupObject>NLayersApp.SampleProject.Program</StartupObject>
+    <LangVersion>8.0</LangVersion>
     <RestoreSources>
       https://api.nuget.org/v3/index.json;
       https://pkgs.dev.azure.com/cherkaouimouad/NLayersApp.Persistence/_packaging/NLayersApp.Persistence/nuget/v3/index.json;
