@@ -40,14 +40,57 @@ namespace NLayersApp.SampleProject
             var resolver = new TypesResolver(() => new Type[] { typeof(TestModel) });
 
             services.AddScoped<ITypesResolver>(s => resolver);
-            // services.AddScoped<TDbContext>();
+            services.AddScoped<TDbContext>();
 
-            services.AddDbContext<IContext, TDbContext>(optionsAction: (s, o) =>
-            {
-                o.UseSqlServer("Server=.\\;Initial Catalog=nlayersapp-tests; Integrated Security=True;");
-            }, ServiceLifetime.Scoped);
+            services.AddDbContext<IContext, TDbContext>(
+                optionsAction: (s, o) =>
+                {
+                    o.UseSqlServer(
+                        connectionString: "Server=.\\;Initial Catalog=nlayersapp-tests; Integrated Security=True;", 
+                        sqlServerOptionsAction: b => b.MigrationsAssembly("NLayersApp.SampleProject")
+                    );
+                    o.UseOpenIddict();
+                }, 
+                contextLifetime: ServiceLifetime.Scoped
+            );
 
-            // ConfigureAuthenticationAndAuthorisation(services);
+            ConfigureAuthenticationAndAuthorisation(services);
+
+            services.AddOpenIddict()
+                .AddCore(options => {
+                    options
+                        .UseEntityFrameworkCore()
+                        .UseDbContext<TDbContext>();
+                })
+                .AddServer(options => {
+                    // Enable the authorization, logout, token and userinfo endpoints.
+                    options
+                        .EnableTokenEndpoint("/connect/token")
+                        .EnableAuthorizationEndpoint("/connect/authorize")
+                        .EnableLogoutEndpoint("/connect/logout")
+                        .EnableUserinfoEndpoint("/connect/userinfo");
+
+                    options
+                        .AllowClientCredentialsFlow()
+                        .AllowAuthorizationCodeFlow()
+                        .AllowPasswordFlow()
+                        .AllowRefreshTokenFlow()
+                        .DisableHttpsRequirement() // development 
+                        .AllowImplicitFlow();
+
+                    // During development, you can disable the HTTPS requirement.
+
+                    // Mark the "email", "profile" and "roles" scopes as supported scopes.
+                    options.RegisterScopes(OpenIddictConstants.Scopes.Email,
+                                            OpenIddictConstants.Scopes.Profile,
+                                            OpenIddictConstants.Scopes.Roles);
+
+                    // Register the signing and encryption credentials.
+                    options.AddEphemeralSigningKey();
+
+                    options.UseJsonWebTokens();
+                    options.AcceptAnonymousClients();
+                });
 
             services.AddMediatRHandlers(resolver);
 
@@ -60,20 +103,19 @@ namespace NLayersApp.SampleProject
         {
             services.AddAuthentication(options =>
             {
-                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = "app";
-                options.DefaultScheme = "app";
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = "Bearer";
+                options.DefaultScheme = "Bearer";
             })
             .AddCookie();
 
 
             services.AddIdentity<IdentityUser, IdentityRole>()
-                .AddEntityFrameworkStores<TDbContextConfigStore>()
+                .AddEntityFrameworkStores<TDbContext>()
                 .AddUserManager<UserManager<IdentityUser>>()
                 .AddRoleManager<RoleManager<IdentityRole>>()
                 .AddDefaultTokenProviders();
-            //.AddClaimsPrincipalFactory();
 
             services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
                .AllowAnyMethod()
@@ -107,7 +149,7 @@ namespace NLayersApp.SampleProject
             app.UseCors("AllowAll");
             app.UseHttpsRedirection();
             
-            //app.UseAuthentication();
+            app.UseAuthentication();
 
             // app.UseClientSideBlazorFiles<Client.Startup>();
             
