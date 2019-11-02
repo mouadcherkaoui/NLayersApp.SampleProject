@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 using OpenIddict.EntityFrameworkCore.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using NLayersApp.Controllers;
+using NLayersApp.Authorization;
 
 namespace NLayersApp.SampleProject
 {
@@ -54,43 +55,11 @@ namespace NLayersApp.SampleProject
                 contextLifetime: ServiceLifetime.Scoped
             );
 
-            ConfigureAuthenticationAndAuthorisation(services);
+            services.ConfigureAuthenticationAndAuthorisation<IdentityUser, IdentityRole, string, TDbContext>();
 
-            services.AddOpenIddict()
-                .AddCore(options => {
-                    options
-                        .UseEntityFrameworkCore()
-                        .UseDbContext<TDbContext>();
-                })
-                .AddServer(options => {
-                    // Enable the authorization, logout, token and userinfo endpoints.
-                    options
-                        .EnableTokenEndpoint("/connect/token")
-                        .EnableAuthorizationEndpoint("/connect/authorize")
-                        .EnableLogoutEndpoint("/connect/logout")
-                        .EnableUserinfoEndpoint("/connect/userinfo");
-
-                    options
-                        .AllowClientCredentialsFlow()
-                        .AllowAuthorizationCodeFlow()
-                        .AllowPasswordFlow()
-                        .AllowRefreshTokenFlow()
-                        .DisableHttpsRequirement() // development 
-                        .AllowImplicitFlow();
-
-                    // During development, you can disable the HTTPS requirement.
-
-                    // Mark the "email", "profile" and "roles" scopes as supported scopes.
-                    options.RegisterScopes(OpenIddictConstants.Scopes.Email,
-                                            OpenIddictConstants.Scopes.Profile,
-                                            OpenIddictConstants.Scopes.Roles);
-
-                    // Register the signing and encryption credentials.
-                    options.AddEphemeralSigningKey();
-
-                    options.UseJsonWebTokens();
-                    options.AcceptAnonymousClients();
-                });
+            services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader())); ;
 
             services.AddMediatRHandlers(resolver);
 
@@ -110,16 +79,47 @@ namespace NLayersApp.SampleProject
             })
             .AddCookie();
 
-
             services.AddIdentity<IdentityUser, IdentityRole>()
                 .AddEntityFrameworkStores<TDbContext>()
                 .AddUserManager<UserManager<IdentityUser>>()
                 .AddRoleManager<RoleManager<IdentityRole>>()
                 .AddDefaultTokenProviders();
 
-            services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
-               .AllowAnyMethod()
-               .AllowAnyHeader())); ;
+            services.AddOpenIddict()
+                .AddCore(options => {
+                    options
+                        .UseEntityFrameworkCore()
+                        .UseDbContext<TDbContext>();
+                })
+                .AddServer(options => {
+                                // Enable the authorization, logout, token and userinfo endpoints.
+                                options
+                        .EnableTokenEndpoint("/connect/token")
+                        .EnableAuthorizationEndpoint("/connect/authorize")
+                        .EnableLogoutEndpoint("/connect/logout")
+                        .EnableUserinfoEndpoint("/connect/userinfo");
+
+                    options
+                        .AllowClientCredentialsFlow()
+                        .AllowAuthorizationCodeFlow()
+                        .AllowPasswordFlow()
+                        .AllowRefreshTokenFlow()
+                        .DisableHttpsRequirement() // development 
+                        .AllowImplicitFlow();
+
+                                // During development, you can disable the HTTPS requirement.
+
+                                // Mark the "email", "profile" and "roles" scopes as supported scopes.
+                                options.RegisterScopes(OpenIddictConstants.Scopes.Email,
+                                            OpenIddictConstants.Scopes.Profile,
+                                            OpenIddictConstants.Scopes.Roles);
+
+                                // Register the signing and encryption credentials.
+                                options.AddEphemeralSigningKey();
+
+                    options.UseJsonWebTokens();
+                    options.AcceptAnonymousClients();
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
