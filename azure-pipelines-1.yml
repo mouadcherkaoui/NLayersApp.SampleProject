@@ -22,4 +22,11 @@ steps:
     containerregistrytype: 'Container Registry'
     dockerRegistryEndpoint: 'Docker Hub'
     dockerComposeFile: '**/docker-compose.yml'
-    action: 'Run a Docker Compose command'
+    action: 'Build Services'
+
+- task: DockerCompose@0
+  inputs:
+    containerregistrytype: 'Container Registry'
+    dockerRegistryEndpoint: 'Docker Hub'
+    dockerComposeFile: '**/docker-compose.yml'
+    action: 'Run services'
