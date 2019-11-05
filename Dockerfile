@@ -19,10 +19,6 @@ COPY . .
 WORKDIR /src/NLayersApp.SampleProject
 RUN dotnet build -c Release -o /app
 
-FROM builder AS test
-WORKDIR /src/NLayersApp.SampleProject.Tests
-RUN dotnet test
-
 FROM builder AS publish
 RUN dotnet publish -c Release -o /app
 
