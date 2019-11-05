@@ -51,7 +51,7 @@ namespace NLayersApp.SampleProject
                 optionsAction: (s, o) =>
                 {
                     o.UseSqlServer(
-                        connectionString: "Server=nlayersapp_srv;Initial Catalog=nlayersapp-tests;User ID=sa;Password=P@ssword", //"Server=sql.data;Initial Catalog=nlayersapp-tests;User Id=sa;Password=P@ssword", //
+                        connectionString: "Server=nlayersapp_srv;Initial Catalog=nlayersapp-tests;User Id=sa;Password=P@ssword", // "Server=nlayersapp_srv;Initial Catalog=nlayersapp-tests;User ID=sa;Password=P@ssword", //
                         sqlServerOptionsAction: b =>
                         {
                             b.MigrationsAssembly("NLayersApp.SampleProject");
