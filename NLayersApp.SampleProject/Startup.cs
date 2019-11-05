@@ -51,11 +51,16 @@ namespace NLayersApp.SampleProject
                 optionsAction: (s, o) =>
                 {
                     o.UseSqlServer(
-                        connectionString: "Server=192.168.1.191;Initial Catalog=nlayersapp-tests;User ID=sa;Password=mrullerp!0", //"Server=sql.data;Initial Catalog=nlayersapp-tests;User Id=sa;Password=P@ssword", //
-                        sqlServerOptionsAction: b => b.MigrationsAssembly("NLayersApp.SampleProject")
+                        connectionString: "Server=nlayersapp_srv;Initial Catalog=nlayersapp-tests;User ID=sa;Password=P@ssword", //"Server=sql.data;Initial Catalog=nlayersapp-tests;User Id=sa;Password=P@ssword", //
+                        sqlServerOptionsAction: b =>
+                        {
+                            b.MigrationsAssembly("NLayersApp.SampleProject");
+                            b.EnableRetryOnFailure(3);
+                        }                        
                     );
                     o.UseOpenIddict();
                     // InitializeAsync(s).Wait();
+                    Task.Run(async () => await InitializeAsync(s).ConfigureAwait(true));
                 }, 
                 contextLifetime: ServiceLifetime.Scoped
             );
@@ -73,6 +78,7 @@ namespace NLayersApp.SampleProject
             services.AddControllers() //c => c.Filters.Add(typeof(DynamicAuthorizationFilter<TDbContext>)))
                     .UseDynamicControllers(resolver)
                     .AddControllersAsServices();
+
 
         }
 

@@ -18,6 +18,7 @@ services:
       
   db:
     image: mcr.microsoft.com/mssql/server
+    container_name: nlayersapp_srv
     volumes:
       - mssql-server-data:/var/opt/mssql/data
     environment:
