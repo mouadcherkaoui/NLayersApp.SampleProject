@@ -23,6 +23,8 @@ using OpenIddict.EntityFrameworkCore.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using NLayersApp.Controllers;
 using NLayersApp.Authorization;
+using NLayersApp.SampleProject.Services;
+using NLayersApp.SampleProject.Models;
 
 namespace NLayersApp.SampleProject
 {
@@ -38,7 +40,9 @@ namespace NLayersApp.SampleProject
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var resolver = new TypesResolver(() => new Type[] { typeof(TestModel) });
+            services.AddScoped<IMvcControllerDiscovery, MvcControllerDiscovery>();
+
+            var resolver = new TypesResolver(() => new Type[] { typeof(TestModel), typeof(UserPermissions), typeof(PermissionDefinition) });
 
             services.AddScoped<ITypesResolver>(s => resolver);
             services.AddScoped<TDbContext>();
@@ -47,10 +51,11 @@ namespace NLayersApp.SampleProject
                 optionsAction: (s, o) =>
                 {
                     o.UseSqlServer(
-                        connectionString: "Server=.\\;Initial Catalog=nlayersapp-tests; Integrated Security=True;", 
+                        connectionString: "Server=192.168.1.191;Initial Catalog=nlayersapp-tests;User ID=sa;Password=mrullerp!0", //"Server=sql.data;Initial Catalog=nlayersapp-tests;User Id=sa;Password=P@ssword", //
                         sqlServerOptionsAction: b => b.MigrationsAssembly("NLayersApp.SampleProject")
                     );
                     o.UseOpenIddict();
+                    // InitializeAsync(s).Wait();
                 }, 
                 contextLifetime: ServiceLifetime.Scoped
             );
@@ -62,64 +67,13 @@ namespace NLayersApp.SampleProject
                .AllowAnyHeader())); ;
 
             services.AddMediatRHandlers(resolver);
+            //config => {
+            //config.Filters.Add(typeof(DynamicAuthorizationFilter<TDbContext>));
+        
+            services.AddControllers() //c => c.Filters.Add(typeof(DynamicAuthorizationFilter<TDbContext>)))
+                    .UseDynamicControllers(resolver)
+                    .AddControllersAsServices();
 
-            services.AddControllers()
-                .UseDynamicControllers(resolver)
-                .AddControllersAsServices();
-        }
-
-        private void ConfigureAuthenticationAndAuthorisation(IServiceCollection services)
-        {
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = "Bearer";
-                options.DefaultScheme = "Bearer";
-            })
-            .AddCookie();
-
-            services.AddIdentity<IdentityUser, IdentityRole>()
-                .AddEntityFrameworkStores<TDbContext>()
-                .AddUserManager<UserManager<IdentityUser>>()
-                .AddRoleManager<RoleManager<IdentityRole>>()
-                .AddDefaultTokenProviders();
-
-            services.AddOpenIddict()
-                .AddCore(options => {
-                    options
-                        .UseEntityFrameworkCore()
-                        .UseDbContext<TDbContext>();
-                })
-                .AddServer(options => {
-                                // Enable the authorization, logout, token and userinfo endpoints.
-                                options
-                        .EnableTokenEndpoint("/connect/token")
-                        .EnableAuthorizationEndpoint("/connect/authorize")
-                        .EnableLogoutEndpoint("/connect/logout")
-                        .EnableUserinfoEndpoint("/connect/userinfo");
-
-                    options
-                        .AllowClientCredentialsFlow()
-                        .AllowAuthorizationCodeFlow()
-                        .AllowPasswordFlow()
-                        .AllowRefreshTokenFlow()
-                        .DisableHttpsRequirement() // development 
-                        .AllowImplicitFlow();
-
-                                // During development, you can disable the HTTPS requirement.
-
-                                // Mark the "email", "profile" and "roles" scopes as supported scopes.
-                                options.RegisterScopes(OpenIddictConstants.Scopes.Email,
-                                            OpenIddictConstants.Scopes.Profile,
-                                            OpenIddictConstants.Scopes.Roles);
-
-                                // Register the signing and encryption credentials.
-                                options.AddEphemeralSigningKey();
-
-                    options.UseJsonWebTokens();
-                    options.AcceptAnonymousClients();
-                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -151,10 +105,10 @@ namespace NLayersApp.SampleProject
             
             app.UseAuthentication();
 
+            app.UseAuthorization();
             // app.UseClientSideBlazorFiles<Client.Startup>();
             app.UseRouting();
 
-            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
