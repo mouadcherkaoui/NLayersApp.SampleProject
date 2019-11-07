@@ -50,7 +50,15 @@ namespace NLayersApp.SampleProject.Services
                 select userPermission
             ).ToListAsync();
 
-            if(userPermissions.Select(c => c.ApiEndpoint).Any(c => c == actionId)) return;
+            var action = actionId.Split(':')[2].ToLower();
+            var controller = actionId.Split(':')[1].ToLower();
+            var permissions = userPermissions.First(c => c.ApiEndpoint.ToLower() == controller).Permissions;
+
+            if(permissions != null)
+            {
+                var deserialized_permissions = JsonConvert.DeserializeObject<MvcControllerInfo[]>(permissions);
+                if (deserialized_permissions.Any(p => p.Actions.Any(a => a.Name.ToLower() == action))) return;
+            }
 
             context.Result = new ForbidResult();
         }
