@@ -23,6 +23,11 @@ using OpenIddict.EntityFrameworkCore.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using NLayersApp.Controllers;
 using NLayersApp.Authorization;
+using OpenIddict;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Cors;
 
 namespace NLayersApp.SampleProject
 {
@@ -47,7 +52,7 @@ namespace NLayersApp.SampleProject
                 optionsAction: (s, o) =>
                 {
                     o.UseSqlServer(
-                        connectionString: "Server=.\\;Initial Catalog=nlayersapp-tests; Integrated Security=True;", 
+                        connectionString: "Server=.\\;Initial Catalog=nlayersappdb-tests; Integrated Security=True;", 
                         sqlServerOptionsAction: b => b.MigrationsAssembly("NLayersApp.SampleProject")
                     );
                     o.UseOpenIddict();
@@ -55,7 +60,6 @@ namespace NLayersApp.SampleProject
                 contextLifetime: ServiceLifetime.Scoped
             );
 
-            services.ConfigureAuthenticationAndAuthorisation<IdentityUser, IdentityRole, string, TDbContext>();
 
             services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
                .AllowAnyMethod()
@@ -66,65 +70,15 @@ namespace NLayersApp.SampleProject
             services.AddControllers()
                 .UseDynamicControllers(resolver)
                 .AddControllersAsServices();
-        }
 
-        private void ConfigureAuthenticationAndAuthorisation(IServiceCollection services)
-        {
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = "Bearer";
-                options.DefaultScheme = "Bearer";
-            })
-            .AddCookie();
-
-            services.AddIdentity<IdentityUser, IdentityRole>()
-                .AddEntityFrameworkStores<TDbContext>()
-                .AddUserManager<UserManager<IdentityUser>>()
-                .AddRoleManager<RoleManager<IdentityRole>>()
-                .AddDefaultTokenProviders();
-
-            services.AddOpenIddict()
-                .AddCore(options => {
-                    options
-                        .UseEntityFrameworkCore()
-                        .UseDbContext<TDbContext>();
-                })
-                .AddServer(options => {
-                                // Enable the authorization, logout, token and userinfo endpoints.
-                                options
-                        .EnableTokenEndpoint("/connect/token")
-                        .EnableAuthorizationEndpoint("/connect/authorize")
-                        .EnableLogoutEndpoint("/connect/logout")
-                        .EnableUserinfoEndpoint("/connect/userinfo");
-
-                    options
-                        .AllowClientCredentialsFlow()
-                        .AllowAuthorizationCodeFlow()
-                        .AllowPasswordFlow()
-                        .AllowRefreshTokenFlow()
-                        .DisableHttpsRequirement() // development 
-                        .AllowImplicitFlow();
-
-                                // During development, you can disable the HTTPS requirement.
-
-                                // Mark the "email", "profile" and "roles" scopes as supported scopes.
-                                options.RegisterScopes(OpenIddictConstants.Scopes.Email,
-                                            OpenIddictConstants.Scopes.Profile,
-                                            OpenIddictConstants.Scopes.Roles);
-
-                                // Register the signing and encryption credentials.
-                                options.AddEphemeralSigningKey();
-
-                    options.UseJsonWebTokens();
-                    options.AcceptAnonymousClients();
-                });
+            services.ConfigureAuthenticationAndAuthorisation<IdentityUser, IdentityRole, string, TDbContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            //InitializeAsync(app.ApplicationServices).Wait();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -146,15 +100,15 @@ namespace NLayersApp.SampleProject
                 });
             });
 
-            app.UseCors("AllowAll");
-            app.UseHttpsRedirection();
-            
-            app.UseAuthentication();
-
-            // app.UseClientSideBlazorFiles<Client.Startup>();
+            // app.UseCors("AllowAll");
             app.UseRouting();
 
+            app.UseHttpsRedirection();
+
+            app.UseAuthentication();
+
             app.UseAuthorization();
+
 
             app.UseEndpoints(endpoints =>
             {
