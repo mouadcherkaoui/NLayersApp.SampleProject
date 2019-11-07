@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using OpenIddict.Server;
+using OpenIddict.Validation;
 
 namespace NLayersApp.SampleProject.Controllers
 {
@@ -24,6 +25,7 @@ namespace NLayersApp.SampleProject.Controllers
             _actionDescriptorCollectionProvider = actionDescriptorCollectionProvider;
         }
 
+        [Authorize(AuthenticationSchemes = OpenIddictValidationDefaults.AuthenticationScheme)]
         public IActionResult GetActions()
         {
             return Ok(_actionDescriptorCollectionProvider

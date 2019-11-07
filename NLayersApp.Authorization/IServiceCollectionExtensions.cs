@@ -1,5 +1,4 @@
-﻿using AspNet.Security.OAuth.Validation;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +17,12 @@ namespace NLayersApp.Authorization
             where TKey: IEquatable<TKey>
             where TContext: DbContext, IContext
         {
+            services.AddMvc();
+
+            services.AddAuthorization()
+                .AddAuthentication()
+                .AddOAuthValidation();
+
             services.AddIdentity<TUser, TRole>()
                 .AddEntityFrameworkStores<TContext>()
                 .AddUserManager<UserManager<TUser>>()
@@ -33,16 +38,19 @@ namespace NLayersApp.Authorization
                 .AddServer(options => {
                     // Enable the authorization, logout, token and userinfo endpoints.
                     options
-                        .EnableTokenEndpoint("/connect/token")
-                        .EnableAuthorizationEndpoint("/connect/authorize")
-                        .EnableLogoutEndpoint("/connect/logout")
-                        .EnableUserinfoEndpoint("/connect/userinfo");
+
+            .EnableTokenEndpoint("/connect/token")
+            .EnableAuthorizationEndpoint("/connect/authorize")
+            .EnableLogoutEndpoint("/connect/logout")
+            .EnableUserinfoEndpoint("/connect/userinfo");
 
                     options
                         .AllowClientCredentialsFlow()
+                        .AllowAuthorizationCodeFlow()
                         .AllowPasswordFlow()
                         .AllowRefreshTokenFlow()
-                        .DisableHttpsRequirement();
+                        .DisableHttpsRequirement() // development 
+                        .AllowImplicitFlow();
 
                     // During development, you can disable the HTTPS requirement.
 
@@ -53,19 +61,8 @@ namespace NLayersApp.Authorization
 
                     // Register the signing and encryption credentials.
                     options.AddEphemeralSigningKey();
-
-                    options.UseJsonWebTokens();
                 });
 
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = OAuthValidationDefaults.AuthenticationScheme;
-                options.DefaultSignInScheme = OAuthValidationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = "Bearer";
-                options.DefaultScheme = "Bearer";
-            })
-            .AddOAuthValidation()
-            .AddCookie();
             services.AddScoped<AccountController>();
             services.AddScoped<AuthorizationController>();
 

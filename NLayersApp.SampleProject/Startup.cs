@@ -51,7 +51,7 @@ namespace NLayersApp.SampleProject
                 optionsAction: (s, o) =>
                 {
                     o.UseSqlServer(
-                        connectionString: "Server=nlayersapp_srv;Initial Catalog=nlayersapp-tests;User Id=sa;Password=P@ssword", // "Server=nlayersapp_srv;Initial Catalog=nlayersapp-tests;User ID=sa;Password=P@ssword", //
+                        connectionString: "Server=.\\;Initial Catalog=nlayersappdb-tests;User Id=sa;Password=mrullerp!0", // "Server=nlayersapp_srv;Initial Catalog=nlayersapp-tests;User ID=sa;Password=P@ssword", //
                         sqlServerOptionsAction: b =>
                         {
                             b.MigrationsAssembly("NLayersApp.SampleProject");
@@ -65,7 +65,6 @@ namespace NLayersApp.SampleProject
                 contextLifetime: ServiceLifetime.Scoped
             );
 
-            services.ConfigureAuthenticationAndAuthorisation<IdentityUser, IdentityRole, string, TDbContext>();
 
             services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
                .AllowAnyMethod()
@@ -75,10 +74,11 @@ namespace NLayersApp.SampleProject
             //config => {
             //config.Filters.Add(typeof(DynamicAuthorizationFilter<TDbContext>));
         
-            services.AddControllers() //c => c.Filters.Add(typeof(DynamicAuthorizationFilter<TDbContext>)))
+            services.AddControllers(c => c.Filters.Add(typeof(DynamicAuthorizationFilter<TDbContext>)))
                     .UseDynamicControllers(resolver)
                     .AddControllersAsServices();
 
+            services.ConfigureAuthenticationAndAuthorisation<IdentityUser, IdentityRole, string, TDbContext>();
 
         }
 
@@ -107,14 +107,13 @@ namespace NLayersApp.SampleProject
             });
 
             app.UseCors("AllowAll");
-            app.UseHttpsRedirection();
             
-            app.UseAuthentication();
-
-            app.UseAuthorization();
-            // app.UseClientSideBlazorFiles<Client.Startup>();
             app.UseRouting();
+            
+            app.UseHttpsRedirection();
 
+            
+            app.UseAuthentication().UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

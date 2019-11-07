@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using AspNet.Security.OAuth.Validation;
 using AspNet.Security.OpenIdConnect.Extensions;
 using AspNet.Security.OpenIdConnect.Primitives;
 using Microsoft.AspNetCore.Authentication;
@@ -62,7 +61,7 @@ namespace NLayersApp.SampleProject.Controllers
             throw new NotImplementedException("The specified grant type is not implemented.");
         }
 
-        [Authorize(AuthenticationSchemes = OAuthValidationDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("~/connect/userinfo"), Produces("application/json")]
         public async Task<IActionResult> Userinfo()
         {
@@ -147,7 +146,7 @@ namespace NLayersApp.SampleProject.Controllers
             // Create a new authentication ticket holding the user identity.
             var ticket = new AuthenticationTicket(principal,
                 new AuthenticationProperties(),
-                OAuthValidationDefaults.AuthenticationScheme);
+                OpenIddictServerDefaults.AuthenticationScheme);
 
             // Set the list of scopes granted to the client application.
             ticket.SetScopes(new[]
@@ -164,6 +163,10 @@ namespace NLayersApp.SampleProject.Controllers
             {
                 claim.SetDestinations(GetDestinations(claim, ticket));
             }
+
+            ((ClaimsIdentity)ticket.Principal.Identity).AddClaims(new[] { new Claim(OpenIddictConstants.Claims.Subject, user.Email) });
+
+            // Use the client_id as the subject identifier.
 
             return SignIn(ticket.Principal, ticket.Properties, ticket.AuthenticationScheme);
         }
