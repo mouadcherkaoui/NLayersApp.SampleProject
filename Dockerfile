@@ -6,7 +6,7 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/core/sdk:3.0-buster AS builder
 WORKDIR /src
 
-COPY NLayersApp.SampleProject.sln ./
+COPY *.sln ./
 COPY Nuget.Config ./
 COPY NLayersApp.SampleProject/NLayersApp.SampleProject.csproj NLayersApp.SampleProject/
 COPY NLayersApp.SampleProject.Client/NLayersApp.SampleProject.Client.csproj NLayersApp.SampleProject.Client/
