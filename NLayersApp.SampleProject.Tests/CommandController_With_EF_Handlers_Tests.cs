@@ -46,7 +46,7 @@ namespace NLayersApp.SampleProject.Tests
                 var typesResolver = new TypesResolver(() => new Type[] { typeof(TestModel) });
                 s.AddScoped<ITypesResolver>(s => typesResolver);
                 s.AddDbContext<IContext, TDbContext<IdentityUser, IdentityRole, string>>(options => {
-                    options.UseSqlServer("Server=.\\;Initial Catalog=nlayersapp-tests; Integrated Security=True;");
+                    options.UseSqlServer("Server=nlayersapp_srv;Initial Catalog=nlayersapp-tests;User Id=sa;Password=P@ssword;");
                 }, ServiceLifetime.Scoped);
                 s.AddMediatRHandlers(typesResolver);
                 s.AddMediatR(Assembly.GetEntryAssembly());
