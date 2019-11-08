@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -21,6 +22,9 @@ namespace NLayersApp.SampleProject
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                    // webBuilder.UseUrls("https://*:443", "http://*:80");
+                    // webBuilder.UseIISIntegration();
+                    // webBuilder.UseKestrel();
                 });
     }
 }
