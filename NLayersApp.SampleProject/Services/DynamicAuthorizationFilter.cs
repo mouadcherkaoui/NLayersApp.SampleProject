@@ -23,10 +23,13 @@ namespace NLayersApp.SampleProject.Services
         where TContext: TDbContext, IContext
     {
         private readonly IContext _dbContext;
-
-        public DynamicAuthorizationFilter(IContext dbContext)
+        private readonly UserManager<IdentityUser> _userMgr;
+        private readonly RoleManager<IdentityRole> _roleMgr;
+        public DynamicAuthorizationFilter(IContext dbContext, UserManager<IdentityUser> userMgr, RoleManager<IdentityRole> roleMgr)
         {
             _dbContext = dbContext;
+            _userMgr = userMgr;
+            _roleMgr = roleMgr;
         }
 
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
@@ -42,8 +45,11 @@ namespace NLayersApp.SampleProject.Services
 
             var actionId = GetActionId(context);
             var userName = context.HttpContext.User.Identity.Name;
-            var userId = (await _dbContext.Set<IdentityUser>().FirstOrDefaultAsync(u => u.UserName == userName))?.Id;
-            
+            var user = await _dbContext.Set<IdentityUser>().FirstOrDefaultAsync(u => u.UserName == userName);
+            var userId = user?.Id;
+
+            // var userRoles = await _userMgr.GetRolesAsync(user);
+            // var roles = _roleMgr.Roles.Where(r => userRoles.Contains(r.Name)).ToList();
             var userPermissions = await (
                 from userPermission in _dbContext.Set<UserPermissions>() 
                 where userPermission.UserId == userId
@@ -56,8 +62,8 @@ namespace NLayersApp.SampleProject.Services
 
             if(permissions != null)
             {
-                var deserialized_permissions = JsonConvert.DeserializeObject<MvcControllerInfo[]>(permissions);
-                if (deserialized_permissions.Any(p => p.Actions.Any(a => a.Name.ToLower() == action))) return;
+                //var deserialized_permissions = JsonConvert.DeserializeObject<MvcControllerInfo[]>(permissions);
+                if (permissions.Split(',').Any(p => p.ToLower() == action.ToLower())) return;
             }
 
             context.Result = new ForbidResult();

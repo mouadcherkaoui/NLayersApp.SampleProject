@@ -25,6 +25,7 @@ using NLayersApp.Controllers;
 using NLayersApp.Authorization;
 using NLayersApp.SampleProject.Services;
 using NLayersApp.SampleProject.Models;
+using BlazorBoilerplate.Server.Authorization;
 
 namespace NLayersApp.SampleProject
 {
@@ -79,7 +80,7 @@ namespace NLayersApp.SampleProject
                     .AddControllersAsServices();
 
             services.ConfigureAuthenticationAndAuthorisation<IdentityUser, IdentityRole, string, TDbContext>();
-
+            services.AddScoped<IUserClaimsPrincipalFactory<IdentityUser>, AdditionalUserClaimsPrincipalFactory>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

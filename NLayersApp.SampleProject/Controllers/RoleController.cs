@@ -41,6 +41,7 @@ namespace NLayersApp.SampleProject.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult> Create(RoleViewModel viewModel)
         {
             if (!ModelState.IsValid)
@@ -49,7 +50,7 @@ namespace NLayersApp.SampleProject.Controllers
                 return Ok(bad);
             }
 
-            var user = new IdentityUser { UserName = viewModel.Name };
+            var user = await _userManager.GetUserAsync(User);
             var permissionDefinition = new UserPermissions() {
                 UserId = user.Id
             };
@@ -60,14 +61,20 @@ namespace NLayersApp.SampleProject.Controllers
                     foreach (var action in controller.Actions)
                         action.ControllerId = controller.Id;
 
+                var resultToSerialize = viewModel.SelectedControllers.ToList()
+                    .Select(c => new UserPermissions()
+                    {
+                        UserId = user.Id,
+                        ApiEndpoint = c.Name,
+                        Permissions = $"{c.Actions.Aggregate("", (ac, a) => $"{a.Name},{ac}")}"
+                    });
                 var accessJson = JsonConvert.SerializeObject(viewModel.SelectedControllers);
-                permissionDefinition.Permissions = accessJson;
-            }
-
-            var result = await _dbContext.Set<UserPermissions>().AddAsync(permissionDefinition);
-            await _dbContext.SaveChangesAsync(CancellationToken.None);
-            if (!(result.Entity.Id is 0))
+                permissionDefinition.Permissions = resultToSerialize.Aggregate("", (ac, p) => $"{ac}{p.Permissions},").SkipLast(1).ToString();
+                await _dbContext.Set<UserPermissions>().AddRangeAsync(resultToSerialize);
+                await _dbContext.SaveChangesAsync(CancellationToken.None);
+                
                 return Ok(nameof(Index));
+            }
 
             return BadRequest(viewModel);
         }
