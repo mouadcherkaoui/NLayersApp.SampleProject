@@ -23,11 +23,9 @@ using OpenIddict.EntityFrameworkCore.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using NLayersApp.Controllers;
 using NLayersApp.Authorization;
-using OpenIddict;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Cors;
+using NLayersApp.DynamicPermissions.Services;
+using NLayersApp.DynamicPermissions.Models;
+using NLayersApp.DynamicPermissions;
 
 namespace NLayersApp.SampleProject
 {
@@ -43,7 +41,9 @@ namespace NLayersApp.SampleProject
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var resolver = new TypesResolver(() => new Type[] { typeof(TestModel) });
+            services.AddScoped<IMvcControllerDiscovery, MvcControllerDiscovery>();
+
+            var resolver = new TypesResolver(() => new Type[] { typeof(TestModel), typeof(UserPermissions), typeof(PermissionDefinition) });
 
             services.AddScoped<ITypesResolver>(s => resolver);
             services.AddScoped<TDbContext>();
@@ -52,10 +52,16 @@ namespace NLayersApp.SampleProject
                 optionsAction: (s, o) =>
                 {
                     o.UseSqlServer(
-                        connectionString: "Server=.\\;Initial Catalog=nlayersappdb-tests; Integrated Security=True;", 
-                        sqlServerOptionsAction: b => b.MigrationsAssembly("NLayersApp.SampleProject")
+                        connectionString: "Server=.\\;Initial Catalog=nlayersappdb-tests;User Id=sa;Password=mrullerp!0", // "Server=nlayersapp_srv;Initial Catalog=nlayersapp-tests;User ID=sa;Password=P@ssword", //
+                        sqlServerOptionsAction: b =>
+                        {
+                            b.MigrationsAssembly("NLayersApp.SampleProject");
+                            b.EnableRetryOnFailure(3);
+                        }                        
                     );
                     o.UseOpenIddict();
+                    // InitializeAsync(s).Wait();
+                    Task.Run(async () => await InitializeAsync(s).ConfigureAwait(true));
                 }, 
                 contextLifetime: ServiceLifetime.Scoped
             );
@@ -66,10 +72,14 @@ namespace NLayersApp.SampleProject
                .AllowAnyHeader())); ;
 
             services.AddMediatRHandlers(resolver);
+            //config => {
+            //config.Filters.Add(typeof(DynamicAuthorizationFilter<TDbContext>));
 
-            services.AddControllers()
-                .UseDynamicControllers(resolver)
-                .AddControllersAsServices();
+            services.AddDynamicRolesAuthorizationServices<TDbContext>();
+
+            services.AddControllers(c => c.AddDynamicRolesAuthorizationFilter<TDbContext>())
+                    .UseDynamicControllers(resolver)
+                    .AddControllersAsServices();
 
             services.ConfigureAuthenticationAndAuthorisation<IdentityUser, IdentityRole, string, TDbContext>();
         }
@@ -77,8 +87,6 @@ namespace NLayersApp.SampleProject
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            //InitializeAsync(app.ApplicationServices).Wait();
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -100,15 +108,14 @@ namespace NLayersApp.SampleProject
                 });
             });
 
-            // app.UseCors("AllowAll");
+            app.UseCors("AllowAll");
+            
             app.UseRouting();
-
+            
             app.UseHttpsRedirection();
 
-            app.UseAuthentication();
-
-            app.UseAuthorization();
-
+            
+            app.UseAuthentication().UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
