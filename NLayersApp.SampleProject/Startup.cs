@@ -23,9 +23,9 @@ using OpenIddict.EntityFrameworkCore.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using NLayersApp.Controllers;
 using NLayersApp.Authorization;
-using NLayersApp.SampleProject.Services;
-using NLayersApp.SampleProject.Models;
-using BlazorBoilerplate.Server.Authorization;
+using NLayersApp.DynamicPermissions.Services;
+using NLayersApp.DynamicPermissions.Models;
+using NLayersApp.DynamicPermissions;
 
 namespace NLayersApp.SampleProject
 {
@@ -74,13 +74,14 @@ namespace NLayersApp.SampleProject
             services.AddMediatRHandlers(resolver);
             //config => {
             //config.Filters.Add(typeof(DynamicAuthorizationFilter<TDbContext>));
-        
-            services.AddControllers(c => c.Filters.Add(typeof(DynamicAuthorizationFilter<TDbContext>)))
+
+            services.AddDynamicRolesAuthorizationServices<TDbContext>();
+
+            services.AddControllers(c => c.AddDynamicRolesAuthorizationFilter<TDbContext>())
                     .UseDynamicControllers(resolver)
                     .AddControllersAsServices();
 
             services.ConfigureAuthenticationAndAuthorisation<IdentityUser, IdentityRole, string, TDbContext>();
-            services.AddScoped<IUserClaimsPrincipalFactory<IdentityUser>, AdditionalUserClaimsPrincipalFactory>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

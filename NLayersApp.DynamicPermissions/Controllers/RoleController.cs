@@ -3,21 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AspNet.Security.OAuth.Validation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using NLayersApp.Persistence.Abstractions;
-using NLayersApp.SampleProject.Models;
-using NLayersApp.SampleProject.Services;
-using OpenIddict.Validation;
+using NLayersApp.DynamicPermissions.Models;
+using NLayersApp.DynamicPermissions.Services;
 
 namespace NLayersApp.SampleProject.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]
-    [Authorize(AuthenticationSchemes = OpenIddictValidationDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = OAuthValidationDefaults.AuthenticationScheme)]
     public class RoleController : Controller
     {
         private readonly IMvcControllerDiscovery _mvcControllerDiscovery;
@@ -73,7 +72,7 @@ namespace NLayersApp.SampleProject.Controllers
                 await _dbContext.Set<UserPermissions>().AddRangeAsync(resultToSerialize);
                 await _dbContext.SaveChangesAsync(CancellationToken.None);
                 
-                return Ok(nameof(Index));
+                return Ok();
             }
 
             return BadRequest(viewModel);

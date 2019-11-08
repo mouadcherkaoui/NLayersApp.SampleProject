@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace NLayersApp.SampleProject.Models
+namespace NLayersApp.DynamicPermissions.Models
 {
     public class RoleViewModel
     {

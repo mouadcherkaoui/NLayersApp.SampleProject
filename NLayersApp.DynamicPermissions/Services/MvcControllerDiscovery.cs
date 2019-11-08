@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using NLayersApp.SampleProject.Models;
+using NLayersApp.DynamicPermissions.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,7 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace NLayersApp.SampleProject.Services
+namespace NLayersApp.DynamicPermissions.Services
 {
     public class MvcControllerDiscovery : IMvcControllerDiscovery
     {

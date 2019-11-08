@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using NLayersApp.Persistence;
 using NLayersApp.Persistence.Abstractions;
-using NLayersApp.SampleProject.Models;
+using NLayersApp.DynamicPermissions.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,10 +17,10 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NLayersApp.SampleProject.Services
+namespace NLayersApp.DynamicPermissions.Services
 {
     public class DynamicAuthorizationFilter<TContext> : IAsyncAuthorizationFilter
-        where TContext: TDbContext, IContext
+        where TContext: IContext
     {
         private readonly IContext _dbContext;
         private readonly UserManager<IdentityUser> _userMgr;

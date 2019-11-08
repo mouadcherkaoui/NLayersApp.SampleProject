@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using NLayersApp.Persistence.Abstractions;
-using NLayersApp.SampleProject.Models;
+using NLayersApp.DynamicPermissions.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 //- (Suppress redirect on API URLs in ASP.NET Core)[https://stackoverflow.com/a/56384729/54159]
 //https://adrientorris.github.io/aspnet-core/identity/extend-user-model.html
 
-namespace BlazorBoilerplate.Server.Authorization
+namespace NLayersApp.DynamicPermissions.Services
 {
     public class AdditionalUserClaimsPrincipalFactory : UserClaimsPrincipalFactory<IdentityUser, IdentityRole>
     {

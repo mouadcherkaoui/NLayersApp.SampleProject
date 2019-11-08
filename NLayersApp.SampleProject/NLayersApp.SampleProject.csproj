@@ -28,7 +28,6 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Filter" Version="1.1.2" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.9.5" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.0.0" />
-    <PackageReference Include="NLayersApp.Controllers" Version="0.1.0-CI-20191105-084357" />
     <PackageReference Include="NLayersApp.CQRS" Version="0.1.0-CI-20191030-121933" />
     <PackageReference Include="NLayersApp.Persistence" Version="0.1.0-CI-20191030-115202" />
     <PackageReference Include="NLayersApp.Persistence.Abstractions" Version="0.1.0-CI-20191030-115206" />
@@ -38,7 +37,9 @@
     <PackageReference Include="Serilog" Version="2.9.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\NLayersApp.Controllers\NLayersApp.Controllers\NLayersApp.Controllers.csproj" />
     <ProjectReference Include="..\NLayersApp.Authorization\NLayersApp.Authorization.csproj" />
+    <ProjectReference Include="..\NLayersApp.DynamicPermissions\NLayersApp.DynamicPermissions.csproj" />
   </ItemGroup>
 
 

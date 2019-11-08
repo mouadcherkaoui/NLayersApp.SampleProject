@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using NLayersApp.SampleProject.Models;
+using NLayersApp.DynamicPermissions.Models;
 
-namespace NLayersApp.SampleProject.Services
+namespace NLayersApp.DynamicPermissions.Services
 {
     public interface IMvcControllerDiscovery
     {
