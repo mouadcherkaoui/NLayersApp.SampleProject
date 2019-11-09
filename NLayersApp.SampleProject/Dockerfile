@@ -1,20 +1,20 @@
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-buster-slim AS base
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.0-buster-slim AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
+FROM mcr.microsoft.com/dotnet/core/sdk:3.0-buster AS build
 WORKDIR /src
-COPY ["NLayersApp.Controllers/NLayersApp.Controllers.csproj", "NLayersApp.Controllers/"]
-RUN dotnet restore "NLayersApp.Controllers/NLayersApp.Controllers.csproj"
+COPY ["NLayersApp.SampleProject/NLayersApp.SampleProject.csproj", "NLayersApp.SampleProject/"]
+RUN dotnet restore "NLayersApp.SampleProject/NLayersApp.SampleProject.csproj"
 COPY . .
-WORKDIR "/src/NLayersApp.Controllers"
-RUN dotnet build "NLayersApp.Controllers.csproj" -c Release -o /app/build
+WORKDIR "/src/NLayersApp.SampleProject"
+RUN dotnet build "NLayersApp.SampleProject.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "NLayersApp.Controllers.csproj" -c Release -o /app/publish
+RUN dotnet publish "NLayersApp.SampleProject.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "NLayersApp.Controllers.dll"]
+ENTRYPOINT ["dotnet", "NLayersApp.SampleProject.dll"]
