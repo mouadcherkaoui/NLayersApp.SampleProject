@@ -55,9 +55,12 @@ namespace NLayersApp.SampleProject.Tests
 
             mediator = IoC.ServiceProvider.GetRequiredService<IMediator>();
             var context = IoC.ServiceProvider.GetRequiredService<IContext>();
-
-            await ((DbContext)context).Database.EnsureDeletedAsync();
+            var context_as_dbContext = (DbContext)context;
+            
+            if (context_as_dbContext.Database.CanConnect())
+                await context_as_dbContext.Database.EnsureDeletedAsync();
             await ((DbContext)context).Database.EnsureCreatedAsync();
+
             ((DbContext)context).Database.Migrate();
 
 

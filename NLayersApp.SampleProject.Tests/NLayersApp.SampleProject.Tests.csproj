@@ -49,6 +49,7 @@
 
   <ItemGroup>
     <Folder Include="bin\Debug\netcoreapp3.0\" />
+    <Folder Include="Data\" />
   </ItemGroup>
 
 </Project>
