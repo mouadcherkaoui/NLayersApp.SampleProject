@@ -46,7 +46,8 @@ namespace NLayersApp.SampleProject.Tests
                 var typesResolver = new TypesResolver(() => new Type[] { typeof(TestModel) });
                 s.AddScoped<ITypesResolver>(s => typesResolver);
                 s.AddDbContext<IContext, TDbContext<IdentityUser, IdentityRole, string>>(options => {
-                    options.UseSqlite("Data Source=.\\Data\\nlayersapp.sqlite;");
+                    options.UseInMemoryDatabase("nlayersapp-db");
+                    //.UseSqlite("Data Source=.\\Data\\nlayersapp.sqlite;");
                 }, ServiceLifetime.Scoped);
                 s.AddMediatRHandlers(typesResolver);
                 s.AddMediatR(Assembly.GetEntryAssembly());
