@@ -21,7 +21,7 @@ namespace NLayersApp.SampleProject
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    webBuilder.UseStartup<Startup>();                    
                     // webBuilder.UseUrls("https://*:443", "http://*:80");
                     // webBuilder.UseIISIntegration();
                     // webBuilder.UseKestrel();

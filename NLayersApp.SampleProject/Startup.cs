@@ -36,11 +36,14 @@ namespace NLayersApp.SampleProject
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        public IConfiguration Configuration { get; private set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            Configuration = new ConfigurationBuilder().AddEnvironmentVariables().Build();
+            var connectionString = Configuration["SQL_CONN_STR"];
+
             services.AddScoped<IMvcControllerDiscovery, MvcControllerDiscovery>();
 
             var resolver = new TypesResolver(() => new Type[] { typeof(TestModel), typeof(UserPermissions), typeof(PermissionDefinition) });
@@ -52,7 +55,7 @@ namespace NLayersApp.SampleProject
                 optionsAction: (s, o) =>
                 {
                     o.UseSqlServer(
-                        connectionString: "Server=.\\;Initial Catalog=nlayersappdb-tests;User Id=sa;Password=mrullerp!0", // "Server=nlayersapp_srv;Initial Catalog=nlayersapp-tests;User ID=sa;Password=P@ssword", //
+                        connectionString: connectionString,
                         sqlServerOptionsAction: b =>
                         {
                             b.MigrationsAssembly("NLayersApp.SampleProject");
@@ -61,7 +64,7 @@ namespace NLayersApp.SampleProject
                     );
                     o.UseOpenIddict();
                     // InitializeAsync(s).Wait();
-                    Task.Run(async () => await InitializeAsync(s).ConfigureAwait(true));
+                    // Task.Run(async () => await InitializeAsync(s).ConfigureAwait(true));
                 }, 
                 contextLifetime: ServiceLifetime.Scoped
             );

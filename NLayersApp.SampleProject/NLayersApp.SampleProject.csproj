@@ -23,6 +23,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.0.0" />
@@ -30,8 +32,8 @@
     <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="5.6.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.9.5" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.0.0" />
-    <PackageReference Include="NLayersApp.Authorization" Version="0.1.0-CI-20191101-234921" />
-    <PackageReference Include="NLayersApp.Controllers" Version="0.1.0-CI-20191031-131051" />
+    <PackageReference Include="NLayersApp.Authorization" Version="0.1.0-CI-20191107-143152" />
+    <PackageReference Include="NLayersApp.Controllers" Version="0.1.0-CI-20191108-204505" />
     <PackageReference Include="NLayersApp.CQRS" Version="0.1.0-CI-20191030-121933" />
     <PackageReference Include="NLayersApp.DynamicPermissions" Version="0.1.0-CI-20191108-150251" />
     <PackageReference Include="NLayersApp.Persistence" Version="0.1.0-CI-20191030-115202" />
