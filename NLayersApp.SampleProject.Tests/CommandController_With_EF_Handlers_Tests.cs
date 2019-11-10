@@ -59,9 +59,10 @@ namespace NLayersApp.SampleProject.Tests
             
             if (context_as_dbContext.Database.CanConnect())
                 await context_as_dbContext.Database.EnsureDeletedAsync();
-            await ((DbContext)context).Database.EnsureCreatedAsync();
+            await context_as_dbContext.Database.EnsureCreatedAsync();
 
-            ((DbContext)context).Database.Migrate();
+            // migrate still not working on azure pipeline agent
+            // ((DbContext)context).Database.Migrate();
 
 
             context.Set<TestModel>().AddRange(test_Entities);
