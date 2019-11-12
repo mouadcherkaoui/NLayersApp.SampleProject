@@ -252,38 +252,7 @@ namespace NLayersApp.SampleProject.Migrations
                     b.ToTable("TestModel");
                 });
 
-            modelBuilder.Entity("NLayersApp.SampleProject.Models.PermissionDefinition", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("ModifiedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("ModifiedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Permission")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ResourceName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PermissionDefinition");
-                });
-
-            modelBuilder.Entity("NLayersApp.SampleProject.Models.UserPermissions", b =>
+            modelBuilder.Entity("NLayersApp.DynamicPermissions.Models.UserPermissions", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
