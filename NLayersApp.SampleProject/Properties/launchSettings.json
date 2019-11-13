@@ -14,15 +14,17 @@
       "launchBrowser": true,
       "launchUrl": "",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "SQL_CONN_STR": "Server=.\\;Initial Catalog=nlayersappdb-v2;User Id=sa;Password=mrullerp!0"
       }
     },
-    "NLayersApp.Controllers": {
+    "NLayersApp.SampleProject": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "weatherforecast",
+      "launchUrl": "",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "SQL_CONN_STR": "Server=.\\;Initial Catalog=nlayersappdb-v2;User Id=sa;Password=mrullerp!0"
       },
       "applicationUrl": "https://localhost:5001;http://localhost:5000"
     },
@@ -32,7 +34,8 @@
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/",
       "environmentVariables": {
         "ASPNETCORE_URLS": "https://+:443;http://+:80",
-        "ASPNETCORE_HTTPS_PORT": "44347"
+        "ASPNETCORE_HTTPS_PORT": "44347",
+        "SQL_CONN_STR": "Server=192.168.1.191;Initial Catalog=nlayersappdb-tests;User Id=sa;Password=mrullerp!0"        
       },
       "httpPort": 54337,
       "useSSL": true,

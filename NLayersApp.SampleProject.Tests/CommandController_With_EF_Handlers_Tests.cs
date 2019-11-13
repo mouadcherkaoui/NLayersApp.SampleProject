@@ -46,7 +46,8 @@ namespace NLayersApp.SampleProject.Tests
                 var typesResolver = new TypesResolver(() => new Type[] { typeof(TestModel) });
                 s.AddScoped<ITypesResolver>(s => typesResolver);
                 s.AddDbContext<IContext, TDbContext<IdentityUser, IdentityRole, string>>(options => {
-                    options.UseSqlServer("Server=nlayersapp_srv;Initial Catalog=nlayersapp-tests;User Id=sa;Password=P@ssword;");
+                    options.UseInMemoryDatabase("nlayersapp-db");
+                    //.UseSqlite("Data Source=.\\Data\\nlayersapp.sqlite;");
                 }, ServiceLifetime.Scoped);
                 s.AddMediatRHandlers(typesResolver);
                 s.AddMediatR(Assembly.GetEntryAssembly());
@@ -55,10 +56,14 @@ namespace NLayersApp.SampleProject.Tests
 
             mediator = IoC.ServiceProvider.GetRequiredService<IMediator>();
             var context = IoC.ServiceProvider.GetRequiredService<IContext>();
+            var context_as_dbContext = (DbContext)context;
+            
+            if (context_as_dbContext.Database.CanConnect())
+                await context_as_dbContext.Database.EnsureDeletedAsync();
+            await context_as_dbContext.Database.EnsureCreatedAsync();
 
-            await ((DbContext)context).Database.EnsureDeletedAsync();
-            await ((DbContext)context).Database.EnsureCreatedAsync();
-            ((DbContext)context).Database.Migrate();
+            // migrate still not working on azure pipeline agent
+            // ((DbContext)context).Database.Migrate();
 
 
             context.Set<TestModel>().AddRange(test_Entities);

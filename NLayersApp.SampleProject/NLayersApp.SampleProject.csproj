@@ -5,7 +5,7 @@
     <UserSecretsId>7c036d87-5a53-4c1e-bbc1-e2aa6e3d6fe3</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <ApplicationIcon />
-    <OutputType>Exe</OutputType>
+    <OutputType>exe</OutputType>
     <StartupObject>NLayersApp.SampleProject.Program</StartupObject>
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
@@ -23,6 +23,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.0.0" />
@@ -30,17 +32,20 @@
     <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="5.6.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.9.5" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.0.0" />
-    <PackageReference Include="NLayersApp.Authorization" Version="0.1.0-CI-20191101-234921" />
-    <PackageReference Include="NLayersApp.Controllers" Version="0.1.0-CI-20191031-131051" />
+    <PackageReference Include="NLayersApp.Authorization" Version="0.1.0-CI-20191107-143152" />
+    <PackageReference Include="NLayersApp.Controllers" Version="0.1.0-CI-20191108-204505" />
     <PackageReference Include="NLayersApp.CQRS" Version="0.1.0-CI-20191030-121933" />
     <PackageReference Include="NLayersApp.DynamicPermissions" Version="0.1.0-CI-20191108-150251" />
-    <PackageReference Include="NLayersApp.Persistence" Version="0.1.0-CI-20191030-115202" />
-    <PackageReference Include="NLayersApp.Persistence.Abstractions" Version="0.1.0-CI-20191030-115206" />
+    <PackageReference Include="NLayersApp.Persistence" Version="0.1.0-CI-20191112-222624" />
+    <PackageReference Include="NLayersApp.Persistence.Abstractions" Version="0.1.0-CI-20191112-164410" />
     <PackageReference Include="OpenIddict.Core" Version="2.0.1" />
     <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="2.0.1" />
     <PackageReference Include="OpenIddict.Server" Version="2.0.1" />
     <PackageReference Include="OpenIddict.Validation" Version="2.0.1" />
     <PackageReference Include="Serilog" Version="2.9.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NLayersApp.Models\NLayersApp.Models.csproj" />
   </ItemGroup>
 
 

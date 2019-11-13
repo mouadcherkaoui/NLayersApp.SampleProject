@@ -14,11 +14,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="bin\Debug\netcoreapp3.0\Data\**" />
+    <EmbeddedResource Remove="bin\Debug\netcoreapp3.0\Data\**" />
+    <None Remove="bin\Debug\netcoreapp3.0\Data\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MediatR" Version="7.0.0" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="3.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
@@ -32,6 +39,17 @@
     <PackageReference Include="NLayersApp.CQRS" Version="0.1.0-CI-20191030-121933" />
     <PackageReference Include="NLayersApp.Persistence" Version="0.1.0-CI-20191030-115202" />
     <PackageReference Include="NLayersApp.Persistence.Abstractions" Version="0.1.0-CI-20191030-115206" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Data\nalyersapp.sqlite">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="bin\Debug\netcoreapp3.0\" />
+    <Folder Include="Data\" />
   </ItemGroup>
 
 </Project>

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -12,20 +11,17 @@ using NLayersApp.Persistence;
 using NLayersApp.CQRS.DependencyInjection;
 using NLayersApp.Persistence.Abstractions;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Net;
 using Microsoft.AspNetCore.Diagnostics;
 using OpenIddict.Abstractions;
-using System.Reflection;
 using OpenIddict.Core;
 using System.Threading.Tasks;
 using OpenIddict.EntityFrameworkCore.Models;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using NLayersApp.Controllers;
 using NLayersApp.Authorization;
-using NLayersApp.DynamicPermissions.Services;
-using NLayersApp.DynamicPermissions.Models;
 using NLayersApp.DynamicPermissions;
+using System.Reflection;
+using NLayersApp.Controllers;
+using NLayersApp.DynamicPermissions.Models;
 
 namespace NLayersApp.SampleProject
 {
@@ -36,32 +32,49 @@ namespace NLayersApp.SampleProject
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        public IConfiguration Configuration { get; private set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped<IMvcControllerDiscovery, MvcControllerDiscovery>();
 
-            var resolver = new TypesResolver(() => new Type[] { typeof(TestModel), typeof(UserPermissions), typeof(PermissionDefinition) });
+            Configuration = new ConfigurationBuilder()
+                .AddEnvironmentVariables()
+                .AddJsonFile("appSettings.json")
+                .Build();
+
+            services.AddOptions<TypesResolverOptions>(nameof(TypesResolverOptions));
+            var connectionString = Configuration["SQL_CONN_STR"] ?? "Server=192.168.1.191;Initial Catalog=nlayersappdb-tests;User Id=sa;Password=mrullerp!0";
+
+
+            TypesResolverOptions resolverOptions = new TypesResolverOptions();
+
+            Configuration.GetSection(nameof(TypesResolverOptions)).Bind(resolverOptions);
+
+            foreach (var definition in resolverOptions.TypesDefinitions)
+            {
+                definition.Assembly = appendToExecutionPath(definition);
+            }
+
+            var resolver = new TypesResolver(resolverOptions);
 
             services.AddScoped<ITypesResolver>(s => resolver);
-            services.AddScoped<TDbContext>();
 
-            services.AddDbContext<IContext, TDbContext>(
+            services.AddScoped<IContext, TDbContext>(s => s.GetRequiredService<TDbContext>());
+
+            services.AddDbContext<TDbContext>(
                 optionsAction: (s, o) =>
                 {
                     o.UseSqlServer(
-                        connectionString: "Server=.\\;Initial Catalog=nlayersappdb-tests;User Id=sa;Password=mrullerp!0", // "Server=nlayersapp_srv;Initial Catalog=nlayersapp-tests;User ID=sa;Password=P@ssword", //
+                        connectionString: connectionString,
                         sqlServerOptionsAction: b =>
                         {
                             b.MigrationsAssembly("NLayersApp.SampleProject");
                             b.EnableRetryOnFailure(3);
                         }                        
-                    );
+                    );                
+                    
                     o.UseOpenIddict();
-                    // InitializeAsync(s).Wait();
-                    Task.Run(async () => await InitializeAsync(s).ConfigureAwait(true));
                 }, 
                 contextLifetime: ServiceLifetime.Scoped
             );
@@ -72,8 +85,6 @@ namespace NLayersApp.SampleProject
                .AllowAnyHeader())); ;
 
             services.AddMediatRHandlers(resolver);
-            //config => {
-            //config.Filters.Add(typeof(DynamicAuthorizationFilter<TDbContext>));
 
             services.AddDynamicRolesAuthorizationServices<TDbContext>();
 
@@ -82,11 +93,21 @@ namespace NLayersApp.SampleProject
                     .AddControllersAsServices();
 
             services.ConfigureAuthenticationAndAuthorisation<IdentityUser, IdentityRole, string, TDbContext>();
+
+
+            string appendToExecutionPath(TypeDefinition definition)
+            {
+                var assembly_location = Assembly.GetEntryAssembly().Location;
+                var latstIndexOf_slash = Assembly.GetEntryAssembly().Location.LastIndexOf('/');
+
+                return $"{assembly_location.Remove(latstIndexOf_slash + 1)}{definition.Assembly}";
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

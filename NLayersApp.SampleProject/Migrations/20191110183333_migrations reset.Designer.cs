@@ -10,8 +10,8 @@ using NLayersApp.Persistence;
 namespace NLayersApp.SampleProject.Migrations
 {
     [DbContext(typeof(TDbContext))]
-    [Migration("20191105085422_updating permission tables relationship")]
-    partial class updatingpermissiontablesrelationship
+    [Migration("20191110183333_migrations reset")]
+    partial class migrationsreset
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -254,43 +254,7 @@ namespace NLayersApp.SampleProject.Migrations
                     b.ToTable("TestModel");
                 });
 
-            modelBuilder.Entity("NLayersApp.SampleProject.Models.PermissionDefinition", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("ModifiedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("ModifiedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Permission")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ResourceName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("UserPermissionsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserPermissionsId");
-
-                    b.ToTable("PermissionDefinition");
-                });
-
-            modelBuilder.Entity("NLayersApp.SampleProject.Models.UserPermissions", b =>
+            modelBuilder.Entity("NLayersApp.DynamicPermissions.Models.UserPermissions", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -314,6 +278,9 @@ namespace NLayersApp.SampleProject.Migrations
 
                     b.Property<DateTime>("ModifiedOn")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Permissions")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(max)");
@@ -557,13 +524,6 @@ namespace NLayersApp.SampleProject.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("NLayersApp.SampleProject.Models.PermissionDefinition", b =>
-                {
-                    b.HasOne("NLayersApp.SampleProject.Models.UserPermissions", null)
-                        .WithMany("Permissions")
-                        .HasForeignKey("UserPermissionsId");
                 });
 
             modelBuilder.Entity("OpenIddict.EntityFrameworkCore.Models.OpenIddictAuthorization", b =>
