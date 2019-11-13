@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <UserSecretsId>7c036d87-5a53-4c1e-bbc1-e2aa6e3d6fe3</UserSecretsId>
+    <ProjectGuid>{E2CEBBAF-6DF7-41E9-815D-9AD4CF90C844}</ProjectGuid>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <ApplicationIcon />
     <OutputType>exe</OutputType>
@@ -46,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NLayersApp.Models\NLayersApp.Models.csproj" />
+    <ProjectReference Include="..\NLayersApp.SampleProject.Client\NLayersApp.SampleProject.Client.csproj" />
   </ItemGroup>
 
 
