@@ -8,7 +8,7 @@ WORKDIR /src
 
 COPY *.sln ./
 COPY Nuget.Config ./
-COPY NLayersApp.SampleProject/appSettings.json ./
+COPY NLayersApp.SampleProject/appsettings.json ./
 COPY NLayersApp.SampleProject/NLayersApp.SampleProject.csproj NLayersApp.SampleProject/
 COPY NLayersApp.Models/NLayersApp.Models.csproj NLayersApp.Models/
 COPY NLayersApp.SampleProject.Client/NLayersApp.SampleProject.Client.csproj NLayersApp.SampleProject.Client/

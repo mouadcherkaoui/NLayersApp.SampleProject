@@ -41,7 +41,7 @@ namespace NLayersApp.SampleProject
 
             Configuration = new ConfigurationBuilder()
                 .AddEnvironmentVariables()
-                .AddJsonFile("./appSettings.json")
+                .AddJsonFile("./appsettings.json")
                 .Build();
 
             var connectionString = Configuration["SQL_CONN_STR"] ?? "Server=192.168.1.191;Initial Catalog=nlayersappdb-tests;User Id=sa;Password=mrullerp!0";
