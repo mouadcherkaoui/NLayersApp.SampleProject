@@ -144,8 +144,6 @@ namespace NLayersApp.SampleProject
                     }
                 });
             });
-
-            // app.UseClientSideBlazorFiles<Client.Startup>();
             
             app.UseCors("AllowAll");
             
