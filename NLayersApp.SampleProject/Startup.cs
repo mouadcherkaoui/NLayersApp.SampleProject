@@ -22,6 +22,7 @@ using NLayersApp.DynamicPermissions;
 using System.Reflection;
 using NLayersApp.Controllers;
 using NLayersApp.DynamicPermissions.Models;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 
 namespace NLayersApp.SampleProject
 {
@@ -40,23 +41,12 @@ namespace NLayersApp.SampleProject
 
             Configuration = new ConfigurationBuilder()
                 .AddEnvironmentVariables()
-                .AddJsonFile("appSettings.json")
+                .AddJsonFile("./appsettings.json")
                 .Build();
 
-            services.AddOptions<TypesResolverOptions>(nameof(TypesResolverOptions));
             var connectionString = Configuration["SQL_CONN_STR"] ?? "Server=192.168.1.191;Initial Catalog=nlayersappdb-tests;User Id=sa;Password=mrullerp!0";
 
-
-            TypesResolverOptions resolverOptions = new TypesResolverOptions();
-
-            Configuration.GetSection(nameof(TypesResolverOptions)).Bind(resolverOptions);
-
-            foreach (var definition in resolverOptions.TypesDefinitions)
-            {
-                definition.Assembly = appendToExecutionPath(definition);
-            }
-
-            var resolver = new TypesResolver(resolverOptions);
+            TypesResolver resolver = getResolverFromConfig(nameof(TypesResolverOptions));
 
             services.AddScoped<ITypesResolver>(s => resolver);
 
@@ -65,24 +55,32 @@ namespace NLayersApp.SampleProject
             services.AddDbContext<TDbContext>(
                 optionsAction: (s, o) =>
                 {
-                    o.UseSqlServer(
-                        connectionString: connectionString,
-                        sqlServerOptionsAction: b =>
-                        {
-                            b.MigrationsAssembly("NLayersApp.SampleProject");
-                            b.EnableRetryOnFailure(3);
-                        }                        
-                    );                
-                    
+                o.UseSqlServer(
+                    connectionString: connectionString,
+                    sqlServerOptionsAction: b =>
+                    {
+                        b.MigrationsAssembly("NLayersApp.SampleProject");
+                        b.EnableRetryOnFailure(3);
+                    }
+                );
+
+                //var builder = new ModelBuilder(new ConventionSet());
+                //    foreach (var type in resolver.RegisteredTypes)
+                //    {
+                //        builder.Entity(type);
+                //    }
+                //    builder.FinalizeModel();
+                //    o.UseModel(builder.Model);
                     o.UseOpenIddict();
-                }, 
+                },
                 contextLifetime: ServiceLifetime.Scoped
             );
 
 
-            services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
-               .AllowAnyMethod()
-               .AllowAnyHeader())); ;
+            services.AddCors(options => 
+                options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader())); ;
 
             services.AddMediatRHandlers(resolver);
 
@@ -94,15 +92,33 @@ namespace NLayersApp.SampleProject
 
             services.ConfigureAuthenticationAndAuthorisation<IdentityUser, IdentityRole, string, TDbContext>();
 
+            TypesResolver getResolverFromConfig(string configSection)
+            {
+                services.AddOptions<TypesResolverOptions>(configSection);
 
-            string appendToExecutionPath(TypeDefinition definition)
+                TypesResolverOptions resolverOptions = new TypesResolverOptions();
+
+                Configuration.GetSection(nameof(TypesResolverOptions)).Bind(resolverOptions);
+
+                foreach (var definition in resolverOptions.TypesDefinitions)
+                {
+                    definition.Assembly = appendToExecutionPath(definition.Assembly);
+                }
+
+                var resolver = new TypesResolver(resolverOptions);
+                return resolver;
+            }
+
+            string appendToExecutionPath(string filename)
             {
                 var assembly_location = Assembly.GetEntryAssembly().Location;
                 var latstIndexOf_slash = Assembly.GetEntryAssembly().Location.LastIndexOf('/');
 
-                return $"{assembly_location.Remove(latstIndexOf_slash + 1)}{definition.Assembly}";
+                return $"{assembly_location.Remove(latstIndexOf_slash + 1)}{filename}";
             }
         }
+
+
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -128,7 +144,7 @@ namespace NLayersApp.SampleProject
                     }
                 });
             });
-
+            
             app.UseCors("AllowAll");
             
             app.UseRouting();
@@ -137,6 +153,7 @@ namespace NLayersApp.SampleProject
 
             
             app.UseAuthentication().UseAuthorization();
+
 
             app.UseEndpoints(endpoints =>
             {

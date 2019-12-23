@@ -1,16 +1,16 @@
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.0-buster-slim AS base
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.0-buster AS builder
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS builder
 WORKDIR /src
 
 COPY *.sln ./
 COPY Nuget.Config ./
+COPY NLayersApp.SampleProject/appsettings.json ./
 COPY NLayersApp.SampleProject/NLayersApp.SampleProject.csproj NLayersApp.SampleProject/
 COPY NLayersApp.Models/NLayersApp.Models.csproj NLayersApp.Models/
-COPY NLayersApp.SampleProject.Client/NLayersApp.SampleProject.Client.csproj NLayersApp.SampleProject.Client/
 COPY NLayersApp.SampleProject.Tests/NLayersApp.SampleProject.Tests.csproj NLayersApp.SampleProject.Tests/
 
 RUN dotnet restore --configfile Nuget.Config
